@@ -2,6 +2,10 @@ import { mergeConfig, type UserConfig } from 'vite';
 
 export default (config: UserConfig) => {
   return mergeConfig(config, {
+    server: {
+      allowedHosts: true,
+      port: Number(process.env.STRAPI_ADMIN_CLIENT_PORT) || undefined,
+    },
     plugins: [
       {
         name: 'cm-rebrand',
