@@ -4,7 +4,7 @@
   "private": true,
   "description": "A Content Metric application",
   "scripts": {
-    "build": "strapi build",
+    "build": "strapi build && node scripts/postbuild.js",
     "console": "strapi console",
     "deploy": "strapi deploy",
     "dev": "strapi develop",

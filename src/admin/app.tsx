@@ -28,6 +28,26 @@ export default {
     },
   },
   bootstrap(app: StrapiApp) {
-    // Custom bootstrap logic
+    document.title = 'Content Metric';
+
+    // Keep title updated when Strapi changes it
+    const observer = new MutationObserver(() => {
+      if (document.title.includes('Strapi')) {
+        document.title = document.title.replace(/Strapi Admin/g, 'Content Metric').replace(/\| Strapi/g, '| Content Metric');
+      }
+    });
+    const titleEl = document.querySelector('title');
+    if (titleEl) {
+      observer.observe(titleEl, { childList: true });
+    }
+
+    // Inject favicon if not present
+    if (!document.querySelector('link[rel="icon"]')) {
+      const link = document.createElement('link');
+      link.rel = 'icon';
+      link.type = 'image/png';
+      link.href = '/admin/favicon.png';
+      document.head.appendChild(link);
+    }
   },
 };
