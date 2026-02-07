@@ -19,6 +19,7 @@ export default {
       en: {
         'Auth.form.welcome.title': 'Welcome to Content Metric',
         'Auth.form.welcome.subtitle': 'Log in to your Content Metric account',
+        'Auth.form.register.subtitle': 'Credentials are only used to authenticate in Content Metric. All saved data will be stored in your database.',
         'app.components.LeftMenu.navbrand.title': 'Content Metric',
         'app.components.LeftMenu.navbrand.workplace': 'Dashboard',
         'Settings.application.strapiVersion': 'Version',
