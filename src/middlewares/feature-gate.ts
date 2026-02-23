@@ -6,6 +6,12 @@ export default (config, { strapi }) => {
   if (process.env.CM_HIDE_TRANSFER_TOKENS === 'true') blocked.push('/admin/transfer-tokens');
   if (process.env.CM_HIDE_USERS_PERMISSIONS === 'true') blocked.push('/admin/users-permissions');
   if (process.env.CM_HIDE_MEDIA_LIBRARY === 'true') blocked.push('/admin/upload/settings');
+  if (process.env.CM_HIDE_OVERVIEW === 'true') blocked.push('/admin/information');
+  if (process.env.CM_HIDE_CONTENT_HISTORY === 'true') blocked.push('/admin/audit-logs');
+  if (process.env.CM_HIDE_RELEASES === 'true') blocked.push('/admin/content-releases');
+  if (process.env.CM_HIDE_PLUGINS === 'true') blocked.push('/admin/plugins');
+  if (process.env.CM_HIDE_REVIEW_WORKFLOWS === 'true') blocked.push('/admin/review-workflows');
+  if (process.env.CM_HIDE_SSO === 'true') blocked.push('/admin/providers');
 
   if (blocked.length > 0) {
     strapi.log.info(`[feature-gate] Blocking ${blocked.length} admin routes: ${blocked.join(', ')}`);
