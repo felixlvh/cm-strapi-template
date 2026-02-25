@@ -45,8 +45,8 @@ export default (config, { strapi }) => {
       ctx.body = { error: 'This feature is disabled by your platform administrator.' };
       return;
     }
-    // Prefix match: block path and all sub-paths
-    if (blockedPrefix.some(p => ctx.path.startsWith(p))) {
+    // Prefix match: block path and all sub-paths (but not filenames that happen to share the prefix)
+    if (blockedPrefix.some(p => ctx.path === p || ctx.path.startsWith(p + '/'))) {
       ctx.status = 403;
       ctx.body = { error: 'This feature is disabled by your platform administrator.' };
       return;
