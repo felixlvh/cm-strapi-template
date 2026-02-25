@@ -14,6 +14,7 @@ RUN npm run build
 
 # Stage 2: Production
 FROM node:20-alpine AS runner
+LABEL org.opencontainers.image.source=https://github.com/felixlvh/cm-strapi-template
 WORKDIR /app
 
 RUN apk add --no-cache python3 make g++
