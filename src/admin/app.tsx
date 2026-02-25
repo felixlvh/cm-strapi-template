@@ -54,31 +54,31 @@ export default {
   bootstrap(app: StrapiApp) {
     document.title = 'Content Metric';
 
-    // Auto-reload on stale chunk errors (happens after dev↔prod mode switch)
-    window.addEventListener('error', (e) => {
-      if (e.message?.includes('Failed to fetch dynamically imported module') ||
-          e.message?.includes('Importing a module script failed') ||
-          e.message?.includes('error loading dynamically imported module')) {
-        // Avoid infinite reload loop — only reload once per 30 seconds
-        const lastReload = sessionStorage.getItem('cm_chunk_reload');
-        if (!lastReload || Date.now() - Number(lastReload) > 30000) {
-          sessionStorage.setItem('cm_chunk_reload', String(Date.now()));
-          window.location.reload();
-        }
-      }
-    });
-    window.addEventListener('unhandledrejection', (e) => {
-      const msg = e.reason?.message || String(e.reason || '');
-      if (msg.includes('Failed to fetch dynamically imported module') ||
-          msg.includes('Importing a module script failed') ||
-          msg.includes('error loading dynamically imported module')) {
-        const lastReload = sessionStorage.getItem('cm_chunk_reload');
-        if (!lastReload || Date.now() - Number(lastReload) > 30000) {
-          sessionStorage.setItem('cm_chunk_reload', String(Date.now()));
-          window.location.reload();
-        }
-      }
-    });
+    // Detect server restart / mode switch by comparing loaded scripts against served HTML
+    const loadedScripts = Array.from(document.querySelectorAll('script[type="module"][src]'))
+      .map(s => s.getAttribute('src')!)
+      .filter(Boolean);
+    if (loadedScripts.length > 0) {
+      const checkForNewBuild = async () => {
+        try {
+          const res = await fetch('/admin/', { cache: 'no-store' });
+          if (!res.ok) return;
+          const html = await res.text();
+          const stillValid = loadedScripts.some(src => html.includes(src));
+          if (!stillValid) {
+            const last = sessionStorage.getItem('cm_chunk_reload');
+            if (!last || Date.now() - Number(last) > 30000) {
+              sessionStorage.setItem('cm_chunk_reload', String(Date.now()));
+              window.location.reload();
+            }
+          }
+        } catch { /* server down, retry next interval */ }
+      };
+      setInterval(checkForNewBuild, 15000);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') checkForNewBuild();
+      });
+    }
 
     const observer = new MutationObserver(() => {
       if (document.title.includes('Strapi')) {
