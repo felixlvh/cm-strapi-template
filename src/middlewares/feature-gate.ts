@@ -20,7 +20,17 @@ export default (config, { strapi }) => {
     strapi.log.info(`[feature-gate] Blocking ${blocked.length} admin routes: ${blocked.join(', ')}`);
   }
 
+  // Allowlist: these routes must always be accessible regardless of feature gates
+  const allowlist = [
+    '/admin/users/me',           // Current user profile — required for admin panel to function
+    '/admin/users/me/permissions', // Current user permissions — required for sidebar rendering
+  ];
+
   return async (ctx, next) => {
+    if (allowlist.some(path => ctx.path === path || ctx.path.startsWith(path + '/'))) {
+      await next();
+      return;
+    }
     if (blocked.some(prefix => ctx.path.startsWith(prefix))) {
       ctx.status = 403;
       ctx.body = { error: 'This feature is disabled by your platform administrator.' };
