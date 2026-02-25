@@ -54,6 +54,32 @@ export default {
   bootstrap(app: StrapiApp) {
     document.title = 'Content Metric';
 
+    // Auto-reload on stale chunk errors (happens after dev↔prod mode switch)
+    window.addEventListener('error', (e) => {
+      if (e.message?.includes('Failed to fetch dynamically imported module') ||
+          e.message?.includes('Importing a module script failed') ||
+          e.message?.includes('error loading dynamically imported module')) {
+        // Avoid infinite reload loop — only reload once per 30 seconds
+        const lastReload = sessionStorage.getItem('cm_chunk_reload');
+        if (!lastReload || Date.now() - Number(lastReload) > 30000) {
+          sessionStorage.setItem('cm_chunk_reload', String(Date.now()));
+          window.location.reload();
+        }
+      }
+    });
+    window.addEventListener('unhandledrejection', (e) => {
+      const msg = e.reason?.message || String(e.reason || '');
+      if (msg.includes('Failed to fetch dynamically imported module') ||
+          msg.includes('Importing a module script failed') ||
+          msg.includes('error loading dynamically imported module')) {
+        const lastReload = sessionStorage.getItem('cm_chunk_reload');
+        if (!lastReload || Date.now() - Number(lastReload) > 30000) {
+          sessionStorage.setItem('cm_chunk_reload', String(Date.now()));
+          window.location.reload();
+        }
+      }
+    });
+
     const observer = new MutationObserver(() => {
       if (document.title.includes('Strapi')) {
         document.title = document.title.replace(/Strapi Admin/g, 'Content Metric').replace(/\| Strapi/g, '| Content Metric');
