@@ -25,6 +25,7 @@ export default ({ env }) => ({
   vite: {
     server: {
       allowedHosts: true,
+      hmr: false,
     },
   },
 });
